@@ -1,0 +1,287 @@
+{
+  "dataset": {
+    "name": "FlyRank Content Refresh (anonymized starter slice)",
+    "source_repo": "flyrank-bih/flyrank-ml-internship-starter",
+    "n_rows_raw": 30000,
+    "n_cols_raw": 44,
+    "n_clients": 32,
+    "columns": [
+      "content_id",
+      "client_id",
+      "search_volume",
+      "competition",
+      "competition_level",
+      "cpc",
+      "content_type",
+      "main_intent",
+      "word_count",
+      "char_count",
+      "provider_used",
+      "model_used",
+      "impressions_90d",
+      "clicks_90d",
+      "pageviews_90d",
+      "sessions_90d",
+      "users_90d",
+      "engaged_sessions_90d",
+      "ai_sessions_90d",
+      "scroll_events_90d",
+      "days_with_impressions",
+      "days_with_sessions",
+      "impressions_last_30d",
+      "clicks_last_30d",
+      "sessions_last_30d",
+      "impressions_prev_30d",
+      "clicks_prev_30d",
+      "sessions_prev_30d",
+      "content_age_days",
+      "age_tier",
+      "age_tier_order",
+      "days_since_last_update",
+      "freshness_tier",
+      "word_count_tier",
+      "char_count_tier",
+      "ctr",
+      "avg_position",
+      "engagement_rate",
+      "scroll_rate",
+      "ai_traffic_pct",
+      "impression_tier",
+      "position_tier",
+      "trend_direction",
+      "trend_pct"
+    ]
+  },
+  "missing_values": {
+    "provider_used": 21438,
+    "word_count_tier": 7699,
+    "char_count": 7699,
+    "word_count": 7699,
+    "char_count_tier": 7699,
+    "model_used": 5733,
+    "trend_pct": 3388,
+    "competition_level": 2610,
+    "search_volume": 2468,
+    "competition": 2468,
+    "cpc": 2468,
+    "main_intent": 2374,
+    "scroll_rate": 125
+  },
+  "dtypes": {
+    "content_id": "str",
+    "client_id": "str",
+    "search_volume": "float64",
+    "competition": "float64",
+    "competition_level": "str",
+    "cpc": "float64",
+    "content_type": "str",
+    "main_intent": "str",
+    "word_count": "float64",
+    "char_count": "float64",
+    "provider_used": "str",
+    "model_used": "str",
+    "impressions_90d": "int64",
+    "clicks_90d": "int64",
+    "pageviews_90d": "int64",
+    "sessions_90d": "int64",
+    "users_90d": "int64",
+    "engaged_sessions_90d": "int64",
+    "ai_sessions_90d": "int64",
+    "scroll_events_90d": "int64",
+    "days_with_impressions": "int64",
+    "days_with_sessions": "int64",
+    "impressions_last_30d": "int64",
+    "clicks_last_30d": "int64",
+    "sessions_last_30d": "int64",
+    "impressions_prev_30d": "int64",
+    "clicks_prev_30d": "int64",
+    "sessions_prev_30d": "int64",
+    "content_age_days": "int64",
+    "age_tier": "str",
+    "age_tier_order": "int64",
+    "days_since_last_update": "int64",
+    "freshness_tier": "str",
+    "word_count_tier": "str",
+    "char_count_tier": "str",
+    "ctr": "float64",
+    "avg_position": "float64",
+    "engagement_rate": "float64",
+    "scroll_rate": "float64",
+    "ai_traffic_pct": "float64",
+    "impression_tier": "str",
+    "position_tier": "str",
+    "trend_direction": "str",
+    "trend_pct": "float64"
+  },
+  "categorical_features": [
+    "content_id",
+    "client_id",
+    "competition_level",
+    "content_type",
+    "main_intent",
+    "provider_used",
+    "model_used",
+    "age_tier",
+    "freshness_tier",
+    "word_count_tier",
+    "char_count_tier",
+    "impression_tier",
+    "position_tier",
+    "trend_direction"
+  ],
+  "numerical_features": [
+    "search_volume",
+    "competition",
+    "cpc",
+    "word_count",
+    "char_count",
+    "impressions_90d",
+    "clicks_90d",
+    "pageviews_90d",
+    "sessions_90d",
+    "users_90d",
+    "engaged_sessions_90d",
+    "ai_sessions_90d",
+    "scroll_events_90d",
+    "days_with_impressions",
+    "days_with_sessions",
+    "impressions_last_30d",
+    "clicks_last_30d",
+    "sessions_last_30d",
+    "impressions_prev_30d",
+    "clicks_prev_30d",
+    "sessions_prev_30d",
+    "content_age_days",
+    "age_tier_order",
+    "days_since_last_update",
+    "ctr",
+    "avg_position",
+    "engagement_rate",
+    "scroll_rate",
+    "ai_traffic_pct",
+    "trend_pct"
+  ],
+  "cleaning": {
+    "rows_before": 30000,
+    "rows_removed_low_quality_or_dupe": 0,
+    "rows_after": 30000,
+    "target_definition": "is_declining_label = 1 if trend_direction == 'down' else 0",
+    "declining_rows": 16262,
+    "declining_rate_pct": 54.2
+  },
+  "decline_rate_by_content_type": {
+    "comparison article": 57.2,
+    "keyword article": 56.1,
+    "feedly article": 28.7
+  },
+  "decline_rate_by_freshness_tier": {
+    "91-180": 61.1,
+    "31-90": 58.9,
+    "0-30": 51.1,
+    "181+": 47.1
+  },
+  "split": {
+    "method": "GroupShuffleSplit by client_id (client-holdout, prevents leakage across train/test)",
+    "train_rows": 23837,
+    "test_rows": 6163,
+    "train_clients": 25,
+    "test_clients": 7
+  },
+  "model_results": {
+    "Logistic Regression": {
+      "accuracy": 58.7,
+      "precision": 57.7,
+      "recall": 72.4,
+      "f1": 64.2,
+      "roc_auc": 0.616
+    },
+    "Decision Tree": {
+      "accuracy": 56.5,
+      "precision": 55.8,
+      "recall": 71.5,
+      "f1": 62.7,
+      "roc_auc": 0.592
+    },
+    "Random Forest": {
+      "accuracy": 58.4,
+      "precision": 58.1,
+      "recall": 66.7,
+      "f1": 62.1,
+      "roc_auc": 0.609
+    }
+  },
+  "best_model": "Logistic Regression",
+  "confusion_matrix": [
+    [
+      1339,
+      1675
+    ],
+    [
+      868,
+      2281
+    ]
+  ],
+  "top_features": [
+    {
+      "feature": "days_with_impressions",
+      "importance": 0.1365
+    },
+    {
+      "feature": "log_impressions_90d",
+      "importance": 0.1185
+    },
+    {
+      "feature": "avg_position",
+      "importance": 0.1052
+    },
+    {
+      "feature": "content_age_days",
+      "importance": 0.0848
+    },
+    {
+      "feature": "word_count",
+      "importance": 0.048
+    },
+    {
+      "feature": "char_count",
+      "importance": 0.0458
+    },
+    {
+      "feature": "ctr",
+      "importance": 0.0379
+    },
+    {
+      "feature": "scroll_rate",
+      "importance": 0.0356
+    },
+    {
+      "feature": "days_with_sessions",
+      "importance": 0.0329
+    },
+    {
+      "feature": "log_clicks_90d",
+      "importance": 0.0305
+    },
+    {
+      "feature": "log_sessions_90d",
+      "importance": 0.0294
+    },
+    {
+      "feature": "position_tier_top_3",
+      "importance": 0.0253
+    },
+    {
+      "feature": "age_tier_365+",
+      "importance": 0.0249
+    },
+    {
+      "feature": "days_since_last_update",
+      "importance": 0.0197
+    },
+    {
+      "feature": "impression_tier_low",
+      "importance": 0.0156
+    }
+  ],
+  "classification_report": "              precision    recall  f1-score   support\n\n   Stable/Up       0.61      0.44      0.51      3014\n   Declining       0.58      0.72      0.64      3149\n\n    accuracy                           0.59      6163\n   macro avg       0.59      0.58      0.58      6163\nweighted avg       0.59      0.59      0.58      6163\n"
+}
