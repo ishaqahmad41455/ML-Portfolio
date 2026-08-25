@@ -7,7 +7,8 @@ import pandas as pd
 import streamlit as st
 
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
-from preprocessing import engineer_features  # noqa: E402
+from preprocessing import engineer_features, load_and_clean, get_feature_matrix  # noqa: E402
+from preprocessing import MODEL_NUMERIC_FEATURES, MODEL_CATEGORICAL_FEATURES  # noqa: E402
 
 st.set_page_config(page_title="Content Decline Risk", page_icon="📉", layout="centered")
 
@@ -19,13 +20,60 @@ st.caption(
 )
 
 MODEL_PATH = Path(__file__).resolve().parents[1] / "models" / "model.pkl"
+DATA_PATH = Path(__file__).resolve().parents[1] / "data" / "raw" / "content_refresh_anonymized.csv"
 
-if not MODEL_PATH.exists():
-    st.warning("No trained model found. Run `python src/train.py` first to generate `models/model.pkl`.")
+
+@st.cache_resource(show_spinner="Training model (first run only)...")
+def load_or_train_model():
+    """Load the saved pipeline, or train a fresh one on the fly if model.pkl is missing.
+
+    This lets the app deploy cleanly on platforms like Streamlit Community Cloud
+    even when models/model.pkl isn't committed to the repo (e.g. it's gitignored).
+    """
+    if MODEL_PATH.exists():
+        with open(MODEL_PATH, "rb") as f:
+            return pickle.load(f)
+
+    if not DATA_PATH.exists():
+        return None  # nothing we can do — no saved model and no raw data to train from
+
+    from sklearn.compose import ColumnTransformer
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.pipeline import Pipeline
+    from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+    df = load_and_clean(str(DATA_PATH))
+    df = engineer_features(df)
+    X, y, _ = get_feature_matrix(df)
+
+    preprocess = ColumnTransformer([
+        ("num", StandardScaler(), MODEL_NUMERIC_FEATURES),
+        ("cat", OneHotEncoder(handle_unknown="ignore"), MODEL_CATEGORICAL_FEATURES),
+    ])
+    pipe = Pipeline([
+        ("prep", preprocess),
+        ("clf", LogisticRegression(max_iter=1000, random_state=42)),
+    ])
+    pipe.fit(X, y)
+
+    # Cache it to disk too, so future restarts on the same machine skip retraining
+    MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(MODEL_PATH, "wb") as f:
+        pickle.dump(pipe, f)
+
+    return pipe
+
+
+pipe = load_or_train_model()
+
+if pipe is None:
+    st.warning(
+        "No trained model found and no raw dataset available to train one.\n\n"
+        "Either commit `models/model.pkl`, or make sure "
+        "`data/raw/content_refresh_anonymized.csv` is available in the deployed repo "
+        "so the app can train on first run."
+    )
     st.stop()
-
-with open(MODEL_PATH, "rb") as f:
-    pipe = pickle.load(f)
 
 st.subheader("Content signals (90-day window)")
 
